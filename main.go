@@ -3,7 +3,6 @@ package main
 import (
 	"net/http"
 	"strconv"
-	"time"
 
 	"database/sql"
 	"fmt"
@@ -97,19 +96,16 @@ func main() {
 	})
 	//Insert
 	e.POST("/create", func(c echo.Context) error {
-		title := "yamashita_H"
-		// c.FormValue("title")
-		detail := "huzoku_gayoi_no_yamashita"
-		// c.FormValue("detil")
-		expireDate := time.Now()
-		// c.FormValue("expire_date")
+		title := c.FormValue("title")
+		detail := c.FormValue("detil")
+		expireDate := c.FormValue("expire_date")
 		insert, err := db.Prepare("INSERT INTO todo(title,detail,expire_date) VALUES(?,?,?)")
 		if err != nil {
 			log.Fatal(err)
 		}
 		defer insert.Close()
-		insert.Exec(title, detail, expireDate.String())
-		return c.String(http.StatusOK, "title:"+title+", detail:"+detail+", expire_date:"+expireDate.String())
+		insert.Exec(title, detail, expireDate)
+		return c.String(http.StatusOK, "title:"+title+", detail:"+detail+", expire_date:"+expireDate)
 	})
 	e.Logger.Fatal(e.Start(":1323"))
 }
