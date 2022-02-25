@@ -67,31 +67,15 @@ func main() {
 	})
 	//SELECT detail
 	e.GET("/todos/:id", func(c echo.Context) error {
-		id, err := strconv.Atoi(c.Param("id"))
-		if err != nil {
-			log.Fatal(err)
-		}
-		pre, err := db.Prepare("SELECT * FROM todo WHERE id=?")
-		if err != nil {
-			log.Fatal(err)
-		}
-		row, err := pre.Query(id)
-		if err != nil {
+		id, _ := strconv.Atoi(c.Param("id"))
+		row := db.QueryRow("SELECT * FROM todo WHERE id=?", id)
+
+		var result todos
+		if err := row.Scan(&result.ID, &result.Title, &result.Detail, &result.Expire_date); err != nil {
 			log.Fatal(err)
 		}
 
-		var result []todos
-		for row.Next() {
-			todo := todos{}
-			if err := row.Scan(&todo.ID, &todo.Title); err != nil {
-				log.Fatal(err)
-			}
-			result = append(result, todo)
-		}
-
-		for _, u := range result {
-			fmt.Println("id: ", u.ID, ", title: ", u.Title)
-		}
+		fmt.Println("id: ", result.ID, ", title: ", result.Title, ", detail: ", result.Detail, "expire_date: ", result.Expire_date)
 		return c.String(http.StatusOK, "List display")
 	})
 	//Insert
