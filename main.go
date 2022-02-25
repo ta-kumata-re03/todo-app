@@ -65,7 +65,7 @@ func main() {
 		}
 		return c.String(http.StatusOK, "List display")
 	})
-	//SELECT detail
+	//Select detail
 	e.GET("/todos/:id", func(c echo.Context) error {
 		id, _ := strconv.Atoi(c.Param("id"))
 		row := db.QueryRow("SELECT * FROM todo WHERE id=?", id)
@@ -89,6 +89,20 @@ func main() {
 		}
 		defer insert.Close()
 		insert.Exec(title, detail, expireDate)
+		return c.String(http.StatusOK, "title:"+title+", detail:"+detail+", expire_date:"+expireDate)
+	})
+	//Update
+	e.POST("todos/:id", func(c echo.Context) error {
+		id, _ := strconv.Atoi(c.Param("id"))
+		title := c.FormValue("title")
+		detail := c.FormValue("detil")
+		expireDate := c.FormValue("expire_date")
+		update, err := db.Prepare("UPDATE todo SET title = ?,detail = ?,expire_date = ? WHERE id = ?")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer update.Close()
+		update.Exec(title, detail, expireDate, id)
 		return c.String(http.StatusOK, "title:"+title+", detail:"+detail+", expire_date:"+expireDate)
 	})
 	e.Logger.Fatal(e.Start(":1323"))
