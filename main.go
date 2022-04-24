@@ -86,7 +86,7 @@ func main() {
 		}
 		defer insert.Close()
 		insert.Exec(title, detail, expireDate)
-		return c.Redirect(http.StatusMovedPermanently, "http://localhost:1323/todos")
+		return c.Redirect(http.StatusMovedPermanently, "http://localhost:3000/todos")
 	})
 	//Update
 	e.POST("todos/:id", func(c echo.Context) error {
@@ -100,7 +100,7 @@ func main() {
 		}
 		defer update.Close()
 		update.Exec(title, detail, expireDate, id)
-		return c.String(http.StatusCreated, "")
+		return c.Redirect(http.StatusMovedPermanently, "http://localhost:3000/todos")
 	})
 	e.Logger.Fatal(e.Start(":1323"))
 }
