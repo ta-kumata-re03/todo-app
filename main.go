@@ -78,7 +78,7 @@ func main() {
 	//Insert
 	e.POST("/create", func(c echo.Context) error {
 		title := c.FormValue("title")
-		detail := c.FormValue("detil")
+		detail := c.FormValue("detail")
 		expireDate := c.FormValue("expire_date")
 		insert, err := db.Prepare("INSERT INTO todo(title,detail,expire_date) VALUES(?,?,?)")
 		if err != nil {
@@ -86,13 +86,13 @@ func main() {
 		}
 		defer insert.Close()
 		insert.Exec(title, detail, expireDate)
-		return c.String(http.StatusOK, "title:"+title+", detail:"+detail+", expire_date:"+expireDate)
+		return c.Redirect(http.StatusMovedPermanently, "http://localhost:1323/todos")
 	})
 	//Update
 	e.POST("todos/:id", func(c echo.Context) error {
 		id, _ := strconv.Atoi(c.Param("id"))
 		title := c.FormValue("title")
-		detail := c.FormValue("detil")
+		detail := c.FormValue("detail")
 		expireDate := c.FormValue("expire_date")
 		update, err := db.Prepare("UPDATE todo SET title = ?,detail = ?,expire_date = ? WHERE id = ?")
 		if err != nil {
@@ -100,7 +100,7 @@ func main() {
 		}
 		defer update.Close()
 		update.Exec(title, detail, expireDate, id)
-		return c.String(http.StatusOK, "title:"+title+", detail:"+detail+", expire_date:"+expireDate)
+		return c.String(http.StatusCreated, "")
 	})
 	e.Logger.Fatal(e.Start(":1323"))
 }
