@@ -73,7 +73,7 @@ func main() {
 		}
 
 		fmt.Println("id: ", result.ID, ", title: ", result.Title, ", detail: ", result.Detail, "expire_date: ", result.Expire_date)
-		return c.String(http.StatusOK, "List display")
+		return c.JSON(http.StatusOK, result)
 	})
 	//Insert
 	e.POST("/create", func(c echo.Context) error {
