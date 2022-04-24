@@ -29,6 +29,14 @@ tasks:
         if [[ "$ANSWER" != 'yes' ]]; then exit 1; fi
       - task: database:drop
       - task: migrate:up
+      - |
+        mysql \
+        --user "$DATASOURCE_USER" \
+        --host "$DATASOURCE_HOST" \
+        --port "$DATASOURCE_PORT" \
+        -p"$DATASOURCE_PASSWORD" \
+        --database "$DATASOURCE_DATABASE" \
+        -e 'source {{.DATA_SOURCE | default "config/database/datas/data.sql"}}'
 
   database:drop:
     cmds:
