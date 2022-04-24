@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 	"strconv"
 
 	"database/sql"
@@ -13,18 +14,32 @@ import (
 	"github.com/labstack/echo"
 )
 
-type (
-	todos struct {
-		ID          string `json:"id"`
-		Title       string `json:"title"`
-		Detail      string `json:"detail"`
-		Expire_date string `json:"expire_date"`
-	}
-)
+type Todos struct {
+	Todos []Todo `json:"todos"`
+}
+
+type Todo struct {
+	ID          string `json:"id"`
+	Title       string `json:"title"`
+	Detail      string `json:"detail"`
+	Expire_date string `json:"expire_date"`
+}
 
 func main() {
 	// [ユーザ名]:[パスワード]@tcp([ホスト名]:[ポート番号])/[データベース名]?charset=[文字コード]
-	dbconf := "todo:todo@tcp(127.0.0.1:3307)/todo?charset=utf8mb4"
+	datasourceUser := os.Getenv("DATASOURCE_USER")
+	datasourcePassword := os.Getenv("DATASOURCE_PASSWORD")
+	datasourceHost := os.Getenv("DATASOURCE_HOST")
+	datasourcePort := os.Getenv("DATASOURCE_PORT")
+	datasourceDatabase := os.Getenv("DATASOURCE_DATABASE")
+	dbconf := fmt.Sprintf(
+		"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4",
+		datasourceUser,
+		datasourcePassword,
+		datasourceHost,
+		datasourcePort,
+		datasourceDatabase,
+	)
 
 	db, err := sql.Open("mysql", dbconf)
 
@@ -52,28 +67,29 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		var result []todos
+		var result []Todo
 		for rows.Next() {
-			todo := todos{}
+			todo := Todo{}
 			if err := rows.Scan(&todo.ID, &todo.Title); err != nil {
 				log.Fatal(err)
 			}
 			result = append(result, todo)
 		}
-		return c.JSON(http.StatusOK, result)
+		todos := Todos{result}
+		return c.JSON(http.StatusOK, todos)
 	})
 	//Select detail
 	e.GET("/todos/:id", func(c echo.Context) error {
 		id, _ := strconv.Atoi(c.Param("id"))
 		row := db.QueryRow("SELECT * FROM todo WHERE id=?", id)
 
-		var result todos
-		if err := row.Scan(&result.ID, &result.Title, &result.Detail, &result.Expire_date); err != nil {
+		var todo Todo
+		if err := row.Scan(&todo.ID, &todo.Title, &todo.Detail, &todo.Expire_date); err != nil {
 			log.Fatal(err)
 		}
 
-		fmt.Println("id: ", result.ID, ", title: ", result.Title, ", detail: ", result.Detail, "expire_date: ", result.Expire_date)
-		return c.JSON(http.StatusOK, result)
+		fmt.Println("id: ", todo.ID, ", title: ", todo.Title, ", detail: ", todo.Detail, "expire_date: ", todo.Expire_date)
+		return c.JSON(http.StatusOK, todo)
 	})
 	//Insert
 	e.POST("/create", func(c echo.Context) error {
