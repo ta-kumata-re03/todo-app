@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 	"strconv"
 
 	"database/sql"
@@ -24,7 +25,19 @@ type (
 
 func main() {
 	// [ユーザ名]:[パスワード]@tcp([ホスト名]:[ポート番号])/[データベース名]?charset=[文字コード]
-	dbconf := "todo:todo@tcp(127.0.0.1:3307)/todo?charset=utf8mb4"
+	datasourceUser := os.Getenv("DATASOURCE_USER")
+	datasourcePassword := os.Getenv("DATASOURCE_PASSWORD")
+	datasourceHost := os.Getenv("DATASOURCE_HOST")
+	datasourcePort := os.Getenv("DATASOURCE_PORT")
+	datasourceDatabase := os.Getenv("DATASOURCE_DATABASE")
+	dbconf := fmt.Sprintf(
+		"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4",
+		datasourceUser,
+		datasourcePassword,
+		datasourceHost,
+		datasourcePort,
+		datasourceDatabase,
+	)
 
 	db, err := sql.Open("mysql", dbconf)
 
