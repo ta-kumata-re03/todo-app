@@ -17,15 +17,21 @@
             />
           </div>
           <div class="form__input-item">
-            <label for="detail">有効期限</label>
-            <input type="date" :min="expireStartDate" />
+            <label for="expire_date">有効期限</label>
+            <input
+              type="date"
+              id="expire_date"
+              name="expire_date"
+              :min="expireStartDate"
+              required
+            />
           </div>
           <div class="form__input-item">
             <label for="detail">詳細</label>
             <textarea id="detail" name="detail" placeholder="人参を買う" />
           </div>
         </div>
-        
+
         <button class="form__create-button">登録する</button>
       </form>
     </div>
@@ -55,7 +61,7 @@ const expireStartDate = computed(() => {
     padding: 36px;
     border-radius: 20px;
     background-color: #ffffff;
-    box-shadow: 2px 2px 6px rgba(0, 0, 0, .4);
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
   }
 }
 
