@@ -60,10 +60,7 @@ func main() {
 			}
 			result = append(result, todo)
 		}
-		for _, u := range result {
-			fmt.Println("id: ", u.ID, ", title: ", u.Title)
-		}
-		return c.String(http.StatusOK, "List display")
+		return c.JSON(http.StatusOK, result)
 	})
 	//Select detail
 	e.GET("/todos/:id", func(c echo.Context) error {
